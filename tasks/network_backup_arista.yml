@@ -1,0 +1,15 @@
+---
+- name: eos backup
+  vars:
+    ansible_become: yes
+    ansible_become_method: enable
+  block:
+    - name: eos backup
+      eos_config:
+        backup: yes
+      register: config_output
+
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ config_output.backup_path }}"
+  when: ansible_network_os == 'eos'

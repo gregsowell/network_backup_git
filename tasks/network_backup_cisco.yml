@@ -1,0 +1,43 @@
+---
+- name: ios backup
+  block:
+    - name: ios backup
+      ios_config:
+        backup: yes
+      register: config_output
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ config_output.backup_path }}"
+  when: ansible_network_os == 'ios'
+
+- name: asa backup
+  block:
+    - name: asa backup
+      asa_config:
+        backup: yes
+      register: config_output
+
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ config_output.backup_path }}"
+  when: ansible_network_os == 'asa'
+
+- name: nxos block with cleanup
+  block: 
+    - name: nxos backup
+      nxos_config:
+        backup: yes
+      register: config_output
+
+    - name: Cleanup time from backup
+      replace:
+        path: "{{ config_output.backup_path }}"
+        regexp: '^!Time.*$'
+      changed_when: False
+      delegate_to: localhost
+
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ config_output.backup_path }}"
+  when: ansible_network_os == 'nxos'
+
