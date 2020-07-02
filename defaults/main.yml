@@ -1,0 +1,14 @@
+---
+# defaults file for network_backup_git
+# the local git repo where configs are stored for push/pull
+backup_dir: "{{ playbook_dir }}/net_backups"
+
+# what format to save the file as in the git repo
+backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
+
+# location of the repo
+backup_repo: git@github.com:gregsowell/net_backups
+
+# git update details
+git_name: Greg Sowell
+git_email: networkbackups@gregsowell.com

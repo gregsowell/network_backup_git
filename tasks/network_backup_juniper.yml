@@ -1,0 +1,33 @@
+---
+- name: junos backup
+#  vars:
+#    ansible_become: yes
+#    ansible_become_method: enable
+  block:
+    - name: create a local backup folder
+      delegate_to: localhost
+      file: 
+        path: "{{ playbook_dir }}/backup"
+        state: directory
+        mode: '0755'
+      run_once: true
+
+    - name: junos backup
+      junos_command:
+        commands: show configuration
+      register: run_output
+
+    - name: create backup file with timestamp
+      delegate_to: localhost
+      copy:
+        content: "{{ run_output.stdout | join('\n') }}"
+        dest: "{{ playbook_dir }}/backup/{{ inventory_hostname }}"
+
+#    - name: show junos
+#      debug:
+#        var: run_output
+
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ playbook_dir }}/backup/{{ inventory_hostname }}"
+  when: ansible_network_os == 'junos'
