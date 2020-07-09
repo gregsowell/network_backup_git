@@ -1,0 +1,52 @@
+---
+- name: mikrotik backup
+  vars:
+    ansible_command_timeout: 180
+#    ansible_become: yes
+#    ansible_become_method: enable
+  block:
+    - name: create a local backup folder
+      delegate_to: localhost
+      file: 
+        path: "{{ playbook_dir }}/backup"
+        state: directory
+        mode: '0755'
+      run_once: true
+
+    - name: Collect system package print detail output
+      routeros_command:
+        commands: system package print detail without-paging
+      register: SYSPKGDTL
+
+    - name: Collect system routerboard print output
+      routeros_command:
+        commands: system routerboard print
+      register: SYSRTRBRD
+
+    - name: Collect system license print output
+      routeros_command:
+        commands: system license print
+      register: SYSLIC
+
+    - name: Export configuration commands
+      routeros_command:
+        commands: export
+      register: EXPORT
+
+    - name: save variable
+      set_fact: 
+        bup_temp_file: "{{ playbook_dir }}/backup/{{ inventory_hostname }}"
+
+    - name: save output to a file
+      delegate_to: localhost
+      copy:
+        content: "===system package print detail===\n{{ SYSPKGDTL.stdout|join('\n') }}\n===system routerboard print===\n{{ SYSRTRBRD.stdout|join('\n') }}\n===system license print===\n{{ SYSLIC.stdout|join('\n') }}\n===export configuration===\n{{ EXPORT.stdout | join('\n') }}\n"
+        dest: "{{ bup_temp_file }}"
+
+    - name: Make sure group wheel is not in the sudoers configuration
+      lineinfile:
+        path: "{{ bup_temp_file }}"
+        state: absent
+        regexp: '.* by RouterOS .*'
+
+  when: ansible_network_os == 'routeros'
