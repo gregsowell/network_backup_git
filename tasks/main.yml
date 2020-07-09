@@ -23,6 +23,11 @@
 #    include_tasks: "{{ playbook_dir }}/network_backup_juniper.yml"
     when: ansible_network_os == "junos"
 
+  - name: include routeros task when Mikrotik device
+    include_tasks: "{{ role_path }}/tasks/network_backup_mikrotik.yml"
+#    include_tasks: "{{ playbook_dir }}/network_backup_mikrotik.yml"
+    when: ansible_network_os == "routeros"
+
   - name: Copy the backup to repo
     copy:
       src: "{{ bup_temp_file }}"
