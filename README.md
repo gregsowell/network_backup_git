@@ -48,8 +48,8 @@ Example Playbook
     backup_dir: "{{ playbook_dir }}/net_backups"
     backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
     backup_repo: git@github.com:gregsowell/backups
-    git_name: Greg Sowell
-    git_email: greg@gregsowell.com
+    git_name: Git Backup
+    git_email: gitbackup@gregsowell.com
   
   tasks:
 
