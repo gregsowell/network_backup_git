@@ -2,7 +2,7 @@ Role Name
 =========
 
 This role does network device backups, then saves the results to a git repository.
-It currently only supports Cisco, Arista, and Juniper.
+It currently only supports Cisco, Arista, Juniper, and Mikrotik.
 
 Requirements
 ------------
