@@ -16,8 +16,9 @@ Role Variables
 --------------
 
 Check the default folder for configurable variables:
+```
 ---
-'''# defaults file for network_backup_git
+# defaults file for network_backup_git
 # the local git repo where configs are stored for push/pull
 backup_dir: "{{ playbook_dir }}/net_backups"
 
@@ -30,7 +31,7 @@ backup_repo: git@github.com:gregsowell/net_backups
 # git update details
 git_name: Greg Sowell
 git_email: networkbackups@gregsowell.com
-'''
+```
 
 Dependencies
 ------------
@@ -38,7 +39,7 @@ NA
 
 Example Playbook
 ----------------
-'''
+```
 ---
 - name: network device backup to git
   hosts: crtr3
@@ -54,7 +55,7 @@ Example Playbook
 
   - import_role:
       name: network_backup_git
-'''
+```
 
 License
 -------
