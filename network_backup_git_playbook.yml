@@ -2,7 +2,7 @@
 - name: network device backup to git
 #  hosts: crtr3,sw1,crtr2,sw2,mtk1
 #  hosts: mtk1
-  hosts: update_lab
+  hosts: cat_update_lab
   gather_facts: false
   vars:
     backup_dir: "{{ playbook_dir }}/net_backups"
