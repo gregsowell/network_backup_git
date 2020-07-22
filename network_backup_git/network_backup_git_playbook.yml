@@ -1,0 +1,55 @@
+---
+- name: network device backup to git
+#  hosts: mtk1
+  hosts: cat_update_lab
+  gather_facts: false
+  vars:
+    # Setting this to true here or overriding it in a playbook will cause the run to
+    # check if it can ping a host before attempting to back it up.  This will speed up
+    # overall processing of the play(with large hosts).
+    check_for_reachability: False
+  
+  tasks:
+    # Run this code block when checking for reliability
+    - name: check for reachability block
+      when: check_for_reachability
+      block:
+        - name: Ping for reachability
+          command: ping -c1 {{ ansible_host }}
+          delegate_to: localhost
+          register: ping_result
+          ignore_errors: true
+
+        - name: Group hosts by online
+          group_by: key=reachable
+          when: ping_result.rc == 0
+    
+    # Reliability was skipped
+    - name: not checking for reachability
+      group_by: key=reachable
+      when: not check_for_reachability
+
+- name: network device backup to git
+  hosts: reachable
+  gather_facts: false
+  vars:
+#    backup_dir: "{{ playbook_dir }}/net_backups"
+    backup_dir: "/opt/net_backups"
+    backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
+    backup_repo: git@github.com:gregsowell/backups
+    git_name: Git Backup
+    git_email: gitbackup@gregsowell.com
+
+  tasks:
+
+# ensure git is installed on centos - only needed on very first run
+#  - name: install git client
+#    run_once: True
+#    become: True
+#    delegate_to: localhost
+#    yum:
+#      name: git
+#      state: latest
+
+  - import_role:
+      name: network_backup_git
