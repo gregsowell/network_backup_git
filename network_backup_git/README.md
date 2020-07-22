@@ -16,9 +16,11 @@ Role Variables
 --------------
 
 Check the default folder for configurable variables:
+```
 ---
-# defaults file for network_backup_git
-# the local git repo where configs are stored for push/pull
+# Defaults file for network_backup_git
+# The local git repo where configs are stored for push/pull
+# ***Make sure this is a writable folder in Tower(add this to the "isolated jobs path").***
 backup_dir: "{{ playbook_dir }}/net_backups"
 
 # what format to save the file as in the git repo
@@ -30,7 +32,7 @@ backup_repo: git@github.com:gregsowell/net_backups
 # git update details
 git_name: Greg Sowell
 git_email: networkbackups@gregsowell.com
-
+```
 
 Dependencies
 ------------
@@ -38,23 +40,23 @@ NA
 
 Example Playbook
 ----------------
-
+```
 ---
 - name: network device backup to git
-  hosts: crtr3
+  hosts: network_devices
   gather_facts: false
   vars:
     backup_dir: "{{ playbook_dir }}/net_backups"
     backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
     backup_repo: git@github.com:gregsowell/backups
     git_name: Greg Sowell
-    git_email: greg@gregsowell.com
+    git_email: gitbackup@gregsowell.com
   
   tasks:
 
   - import_role:
       name: network_backup_git
-
+```
 License
 -------
 
