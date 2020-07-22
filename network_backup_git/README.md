@@ -20,7 +20,9 @@ Check the default folder for configurable variables:
 ---
 # Defaults file for network_backup_git
 # The local git repo where configs are stored for push/pull
-# ***Make sure this is a writable folder in Tower(add this to the "isolated jobs path").***
+# *Make sure this is a writable folder in Tower(add this to the "isolated jobs path").*
+# **In tower this will need to be a direct path as {{ playbook_dir }} will be a random temp directory on run.**
+# **Try something like 'backup_dir: /opt/net_backups' for tower**
 backup_dir: "{{ playbook_dir }}/net_backups"
 
 # what format to save the file as in the git repo
