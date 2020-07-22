@@ -1,12 +1,23 @@
 ---
+# create the backup folder if it doesn't exist
+  - name: create git repo folder
+    become: True
+    run_once: true
+    delegate_to: localhost
+    file:
+      path: "{{ backup_dir }}"
+      state: directory
+      mode: '0777'
+
 # tasks file for network_backup_git
   - name: make sure the git repo is up to date/exists on localhost
+    delegate_to: localhost
+    run_once: True
+    become: True
     git:
       repo: "{{ backup_repo }}"
       dest: "{{ backup_dir }}"
       update: yes
-    delegate_to: localhost
-    run_once: True
 
   - name: include cisco task when Cisco device
     include_tasks: "{{ role_path }}/tasks/network_backup_cisco.yml"
@@ -46,8 +57,10 @@
     set_fact: time="{{lookup('pipe','date \"+%Y-%m-%d-%H-%M\"')}}"
     run_once: true
 
-  - name: Add any new backups to the repossitory
-    shell: "git add *; git commit -m '{{ time }}'; git push"
+  - name: Add any new backups to the repository - ignore key checking
+#    shell: "git add *; git commit -m '{{ time }}'; git push"
+    shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git push"
+
     args:
       chdir: "{{ backup_dir }}"
     environment:
@@ -60,3 +73,4 @@
     run_once: true
     connection: local
     register: git_return
+    become: True
