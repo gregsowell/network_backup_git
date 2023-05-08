@@ -1,7 +1,7 @@
 ---
 - name: network device backup to git
 #  hosts: mtk1
-  hosts: cat_update_lab
+  hosts: nexus9k3
   gather_facts: false
   vars:
     # Setting this to true here or overriding it in a playbook will cause the run to
@@ -15,18 +15,18 @@
       when: check_for_reachability
       block:
         - name: Ping for reachability
-          command: ping -c1 {{ ansible_host }}
+          ansible.builtin.command: ping -c1 {{ ansible_host }}
           delegate_to: localhost
           register: ping_result
           ignore_errors: true
 
         - name: Group hosts by online
-          group_by: key=reachable
+          ansible.builtin.group_by: key=reachable
           when: ping_result.rc == 0
     
     # Reliability was skipped
     - name: not checking for reachability
-      group_by: key=reachable
+      ansible.builtin.group_by: key=reachable
       when: not check_for_reachability
 
 - name: network device backup to git
@@ -51,5 +51,5 @@
 #      name: git
 #      state: latest
 
-  - import_role:
+  - ansible.builtin.import_role:
       name: network_backup_git
