@@ -1,23 +1,42 @@
 ---
-# create the backup folder if it doesn't exist
-  - name: create git repo folder
-    become: True
+# this is used for tagging a repo
+  - name: get timestamp
+    set_fact: time="{{lookup('pipe','date \"+%Y-%m-%d-%H-%M\"')}}"
+    run_once: true
+
+# this and the following task add a private ssh key to the execution environment so it can connect to git
+  - name: create .ssh folder
+    become: true
     run_once: true
     delegate_to: localhost
-    file:
+    ansible.builtin.file:
+      path: /root/.ssh
+      state: directory
+      mode: '0777'
+
+  - name: create the ssh key file based on the supplied cred
+    become: true
+    run_once: true
+    delegate_to: localhost
+    ansible.builtin.copy:
+      dest: ~/.ssh/id_rsa
+      content: "{{ cert_key }}"
+      mode: '0600'
+#    no_log: true
+
+  - name: create the backup dir
+    become: true
+    run_once: true
+    delegate_to: localhost
+    ansible.builtin.file:
       path: "{{ backup_dir }}"
       state: directory
       mode: '0777'
 
-# tasks file for network_backup_git
-  - name: make sure the git repo is up to date/exists on localhost
-    delegate_to: localhost
-    run_once: True
-    become: True
-    git:
-      repo: "{{ backup_repo }}"
-      dest: "{{ backup_dir }}"
-      update: yes
+  - name: clone the repo
+    ansible.builtin.shell: "git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git clone {{ backup_repo }} ."
+    args:
+      chdir: "{{ backup_dir }}"
 
   - name: include cisco task when Cisco device
     include_tasks: "{{ role_path }}/tasks/network_backup_cisco.yml"
@@ -40,29 +59,55 @@
     when: ansible_network_os == "routeros"
 
   - name: Copy the backup to repo
-    copy:
+    ansible.builtin.copy:
       src: "{{ bup_temp_file }}"
       dest: "{{ backup_file }}"
     register: copy_result
     delegate_to: localhost
 
   - name: Delete the temp file
-    file:
+    ansible.builtin.file:
       path: "{{ bup_temp_file }}"
       state: absent
     changed_when: False
     delegate_to: localhost
 
-  - name: get timestamp
-    set_fact: time="{{lookup('pipe','date \"+%Y-%m-%d-%H-%M\"')}}"
-    run_once: true
-
-  - name: Add any new backups to the repository - ignore key checking
+  - name: push the repo back with tags
+    when: backup_with_tags
 #    shell: "git add *; git commit -m '{{ time }}'; git push"
-    shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git push"
-
+#    shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git push"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push origin --tags"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push --tags"
+    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push; git push --tags"
     args:
-      chdir: "{{ backup_dir }}"
+      chdir: "{{ backup_dir }}{{ backup_repo_folder }}"
+#      chdir: "{{ backup_dir }}{{ backup_repo_folder | default(omit) }}"
+#      chdir: "{{ backup_dir }}/net_backups"
+    environment:
+      GIT_COMMITTER_NAME: "{{ git_name | default(omit) }}"
+      GIT_COMMITTER_EMAIL: "{{ git_email | default(omit) }}"
+      GIT_AUTHOR_NAME: "{{ git_name | default(omit) }}"
+      GIT_AUTHOR_EMAIL: "{{ git_email | default(omit) }}"
+    delegate_to: localhost
+    changed_when: git_return.stderr != "Everything up-to-date"
+    run_once: true
+    connection: local
+    register: git_return
+    become: True
+
+  - name: push the repo back with no tags
+    when: not backup_with_tags
+#    shell: "git add *; git commit -m '{{ time }}'; git push"
+#    shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git push"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push origin --tags"
+#    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push --tags"
+    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git push"
+    args:
+      chdir: "{{ backup_dir }}{{ backup_repo_folder }}"
+#      chdir: "{{ backup_dir }}{{ backup_repo_folder | default(omit) }}"
+#      chdir: "{{ backup_dir }}/net_backups"
     environment:
       GIT_COMMITTER_NAME: "{{ git_name | default(omit) }}"
       GIT_COMMITTER_EMAIL: "{{ git_email | default(omit) }}"
