@@ -36,6 +36,13 @@
       changed_when: False
       delegate_to: localhost
 
+    - name: Cleanup !Running section from backup
+      ansible.builtin.replace:
+        path: "{{ config_output.backup_path }}"
+        regexp: '^!Running.*$'
+      changed_when: False
+      delegate_to: localhost
+
     - name: save variable
       ansible.builtin.set_fact: 
         bup_temp_file: "{{ config_output.backup_path }}"
