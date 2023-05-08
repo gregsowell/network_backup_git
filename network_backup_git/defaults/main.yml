@@ -4,6 +4,9 @@
 # point in time generally used for rollback of configs
 backup_with_tags: false
     
+# if there's some kind of sub folder structure where files are stored, look here
+backup_repo_folder: ""
+
 # the local git repo where configs are stored for push/pull
 backup_dir: "{{ playbook_dir }}/net_backups"
 
