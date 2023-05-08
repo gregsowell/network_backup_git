@@ -2,9 +2,12 @@
 - name: network device backup to git
 #  hosts: crtr3,sw1,crtr2,sw2,mtk1
 #  hosts: mtk1
-  hosts: cat_upgrade
+#  hosts: cat_upgrade
+  hosts: nexus9k3
+  
   gather_facts: false
   vars:
+    backup_with_tags: false
     backup_dir: "{{ playbook_dir }}/net_backups"
     backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
     backup_repo: git@github.com:gregsowell/backups
