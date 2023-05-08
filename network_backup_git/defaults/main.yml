@@ -1,5 +1,9 @@
 ---
 # defaults file for network_backup_git
+# whether or not to add tags when performing the backup.  This will be a
+# point in time generally used for rollback of configs
+backup_with_tags: false
+    
 # the local git repo where configs are stored for push/pull
 backup_dir: "{{ playbook_dir }}/net_backups"
 
