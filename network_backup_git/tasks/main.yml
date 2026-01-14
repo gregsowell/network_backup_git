@@ -35,7 +35,7 @@
 
   - name: clone the repo
     #ansible.builtin.shell: "git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git clone {{ backup_repo }} ."
-    ansible.builtin.shell: "git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no';GIT_SSH_COMMAND='ssh -i /root/.ssh/id_rsa' git clone {{ backup_repo }} ."
+    ansible.builtin.shell: "git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa'; git clone {{ backup_repo }} ."
     args:
       chdir: "{{ backup_dir }}"
 
