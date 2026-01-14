@@ -42,7 +42,7 @@
   - name: include cisco task when Cisco device
     include_tasks: "{{ role_path }}/tasks/network_backup_cisco.yml"
 #    include_tasks: "{{ playbook_dir }}/network_backup_cisco.yml"
-    when: ansible_network_os == "asa" or ansible_network_os == "ios" or ansible_network_os == "nxos"
+    when: ansible_network_os == "cisco.asa.asa" or ansible_network_os == "cisco.ios.ios" or ansible_network_os == "cisco.nxos.nxos"
 
   - name: include arista task when Arista device
     include_tasks: "{{ role_path }}/tasks/network_backup_arista.yml"
