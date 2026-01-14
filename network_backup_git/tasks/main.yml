@@ -19,7 +19,7 @@
     run_once: true
     delegate_to: localhost
     ansible.builtin.copy:
-      dest: ~/.ssh/id_rsa
+      dest: /root/.ssh/id_rsa
       content: "{{ cert_key }}"
       mode: '0600'
 #    no_log: true
