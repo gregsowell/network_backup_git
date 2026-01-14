@@ -80,7 +80,7 @@
 #    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push"
 #    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push origin --tags"
 #    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push --tags"
-    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'; git tag -a {{ time }} -m '{{ time }}'; git push; git push --tags"
+    ansible.builtin.shell: "git add *; git commit -m '{{ time }}'; git config --global core.sshCommand 'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i /root/.ssh/id_rsa'; git tag -a {{ time }} -m '{{ time }}'; git push; git push --tags"
     args:
       chdir: "{{ backup_dir }}{{ backup_repo_folder }}"
 #      chdir: "{{ backup_dir }}{{ backup_repo_folder | default(omit) }}"
