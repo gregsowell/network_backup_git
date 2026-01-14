@@ -8,7 +8,7 @@
     - name: save variable
       ansible.builtin.set_fact: 
         bup_temp_file: "{{ config_output.backup_path }}"
-  when: ansible_network_os == 'ios'
+  when: ansible_network_os == 'cisco.ios.ios'
 
 - name: asa backup
   block:
@@ -20,7 +20,7 @@
     - name: save variable
       ansible.builtin.set_fact: 
         bup_temp_file: "{{ config_output.backup_path }}"
-  when: ansible_network_os == 'asa'
+  when: ansible_network_os == 'cisco.asa.asa'
 
 - name: nxos block with cleanup
   block: 
@@ -46,5 +46,5 @@
     - name: save variable
       ansible.builtin.set_fact: 
         bup_temp_file: "{{ config_output.backup_path }}"
-  when: ansible_network_os == 'nxos'
+  when: ansible_network_os == 'cisco.nxos.nxos'
 
