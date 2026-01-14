@@ -10,7 +10,7 @@
     backup_with_tags: false
     backup_dir: "{{ playbook_dir }}/net_backups"
     backup_file: "{{ backup_dir }}/{{ inventory_hostname }}"
-    backup_repo: git@github.com:gregsowell/backups
+    backup_repo: git@github.com:gregsowell/net_backups
     git_name: Git Backup
     git_email: gitbackup@gregsowell.com
   
